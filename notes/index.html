@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tulis aja. — blog minimal</title>
+
+    <!-- Inline script untuk mencegah FOUC dark mode -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('blog-theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <!-- Google Font dengan display=swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #fafaf9;
+            --surface: #ffffff;
+            --border: #e7e5e4;
+            --text: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+            --accent-soft: #f1f5f9;
+            --highlight-bg: #fef9c3;
+            --highlight-text: #1c1917;
+            --code-bg: #f4f4f5;
+            --code-text: #1c1917;
+            --link-color: #1c1917;
+            --link-hover: #57534e;
+            --radius: 1.5rem;
+            --transition: 0.2s ease;
+            --shadow-float: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --surface: #1c1917;
+            --border: #292524;
+            --text: #fafaf9;
+            --text-secondary: #d6d3d1;
+            --text-muted: #78716c;
+            --accent-soft: #292524;
+            --highlight-bg: #4a3f1f;
+            --highlight-text: #fef9c3;
+            --code-bg: #292524;
+            --code-text: #e7e5e4;
+            --link-color: #fafaf9;
+            --link-hover: #d6d3d1;
+            --shadow-float: 0 12px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            transition: background var(--transition), color var(--transition);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+            position: relative;
+        }
+
+        .container {
+            max-width: 660px;
+            margin: 0 auto;
+            padding: 40px 24px 30px;
+            position: relative;
+        }
+
+        /* ── Header ─────────────────────── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .blog-name {
+            font-size: 1.25rem;
+            font-weight: 550;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: background var(--transition), color var(--transition);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-soft);
+            color: var(--text);
+        }
+
+        .icon-btn .lucide {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.5;
+        }
+
+        .icon-btn.active {
+            background: var(--accent-soft);
+            color: var(--text);
+        }
+
+        .theme-btn .icon-sun,
+        .theme-btn .icon-moon {
+            display: none;
+        }
+        [data-theme="dark"] .theme-btn .icon-sun {
+            display: block;
+        }
+        [data-theme="light"] .theme-btn .icon-moon {
+            display: block;
+        }
+
+        /* ── Pencarian absolute dropdown ──── */
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 10px;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+            pointer-events: none;
+        }
+
+        .search-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: border-color var(--transition);
+        }
+
+        .search-wrapper:focus-within {
+            border-color: var(--text-muted);
+        }
+
+        .search-wrapper .lucide {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+            stroke-width: 1.6;
+        }
+
+        #searchInput {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text);
+            outline: none;
+            letter-spacing: -0.01em;
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ── Section 1: Artikel ────────── */
+        .posts {
+            display: flex;
+            flex-direction: column;
+            gap: 70px;
+            margin-bottom: 70px;
+        }
+
+        .posts.hidden {
+            display: none;
+        }
+
+        .post {
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            scroll-margin-top: 40px;
+            /* untuk navigasi hash */;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: -0.01em;
+        }
+
+        .post-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .post-date .lucide {
+            width: 14px;
+            height: 14px;
+            stroke-width: 1.6;
+        }
+
+        .reading-time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .meta-separator {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .post-title {
+            font-family: 'Playfair Display', 'Times New Roman', Georgia, serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        /* Body dengan paragraf yang lebih bernapas */
+        .post-body {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        .post-body p {
+            margin-bottom: 1.3em;
+        }
+
+        .post-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            background: var(--highlight-bg);
+            color: var(--highlight-text);
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+            font-weight: 500;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        /* ── Blockquote ────────────────── */
+        .post-body blockquote {
+            border-left: 3px solid var(--text-muted);
+            padding-left: 20px;
+            margin: 1.5em 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            letter-spacing: -0.01em;
+        }
+
+        /* ── Block Code ────────────────── */
+        .post-body pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2em;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            border: 1px solid var(--border);
+        }
+
+        .post-body pre code {
+            background: transparent;
+            padding: 0;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        /* ── Inline Code ───────────────── */
+        .post-body code:not(pre code) {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+
+        /* ── Link ──────────────────────── */
+        .post-body a {
+            color: var(--link-color);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            text-decoration-thickness: 1px;
+            transition: color 0.2s;
+        }
+
+        .post-body a:hover {
+            color: var(--link-hover);
+        }
+
+        /* Social + Share di bawah post */
+        .post-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .post-social-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: background var(--transition), color var(--transition);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .post-social-icon:hover {
+            background: var(--accent-soft);
+            color: var(--text);
+        }
+
+        .post-social-icon .lucide {
+            width: 16px;
+            height: 16px;
+            stroke-width: 1.5;
+        }
+
+        .share-btn .icon-share,
+        .share-btn .icon-check {
+            display: flex;
+        }
+
+        .share-btn .icon-check {
+            display: none;
+        }
+
+        .share-btn.copied .icon-share {
+            display: none;
+        }
+        .share-btn.copied .icon-check {
+            display: flex;
+        }
+
+        .share-btn .copied-text {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: var(--bg);
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .share-btn .copied-text.show {
+            opacity: 1;
+        }
+
+        /* ── Section 2: Galeri Gambar ──── */
+        .gallery-section {
+            margin-bottom: 70px;
+            display: none;
+        }
+
+        .gallery-section.visible {
+            display: block;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        @media (max-width: 500px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 16px;
+            box-shadow: var(--shadow-float);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .gallery-img:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+            }
+            .icon-btn:hover,
+            .post-social-icon:hover,
+            .back-to-top:hover {}
+        }
+
+        [data-theme="dark"] .gallery-img:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ── Footer ──────────────────────── */
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .footer .lucide {
+            width: 13px;
+            height: 13px;
+            stroke-width: 1.6;
+        }
+
+        /* ── Back to Top Button ─────────── */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top .lucide {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+        }
+
+        /* Utility */
+        .post.hidden-by-search {
+            display: none;
+        }
+
+        /* Sentinel untuk infinite scroll */
+        #sentinel {
+            height: 1px;
+            width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 30px 18px 30px;
+            }
+            .post-title {
+                font-size: 1.4rem;
+            }
+            .posts {
+                gap: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ═══════════ HEADER ═══════════ -->
+        <header class="header">
+            <span class="blog-name">tulis aja.</span>
+            <div class="header-actions">
+                <button class="icon-btn" id="searchToggle" aria-label="Cari">
+                    <i data-lucide="search"></i>
+                </button>
+                <button class="icon-btn" id="imageSectionToggle" aria-label="Hanya gambar">
+                    <i data-lucide="image"></i>
+                </button>
+                <button class="icon-btn theme-btn" id="themeToggle" aria-label="Ganti mode">
+                    <i data-lucide="sun" class="icon-sun"></i>
+                    <i data-lucide="moon" class="icon-moon"></i>
+                </button>
+            </div>
+            <div class="search-dropdown" id="searchDropdown">
+                <div class="search-wrapper">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="searchInput" placeholder="Cari catatan..." autocomplete="off">
+                </div>
+            </div>
+        </header>
+
+        <!-- ═══════════ SECTION 1: ARTIKEL ═══════════ -->
+        <main class="posts" id="postsContainer">
+            <!-- Artikel 1 -->
+            <article class="post" data-searchable id="pagi-yang-pelan-di-bulan-juni">
+                <div class="post-meta">
+                    <div class="post-date"><i data-lucide="calendar-days"></i><span>Minggu, 6 Juni 2026</span></div>
+                    <span class="meta-separator"></span>
+                    <span class="reading-time">3 menit baca</span>
+                </div>
+                <h2 class="post-title">pagi yang pelan di bulan juni</h2>
+                <div class="post-body">
+                    <p>Hari ini langit abu-abu lembut, cocok buat ngopi lama sambil dengerin suara hujan dari kejauhan. Kayaknya <span class="highlight">juni memang bulan paling tenang</span> tahun ini.</p>
+                    <p>Ada sesuatu tentang pagi yang bikin pikiran lebih jernih — mungkin karena belum banyak notifikasi masuk. Rasanya seperti kertas kosong yang siap diisi.</p>
+                    <p>Rencana hari ini cuma satu: baca buku yang tertunda sejak bulan lalu.</p>
+                </div>
+                <div class="post-actions">
+                    <a href="#" class="post-social-icon"><i data-lucide="twitter"></i></a>
+                    <a href="#" class="post-social-icon"><i data-lucide="instagram"></i></a>
+                    <a href="#" class="post-social-icon"><i data-lucide="at-sign"></i></a>
+                    <button class="post-social-icon share-btn" data-title="pagi yang pelan di bulan juni"><span class="icon-share"><i data-lucide="share-2"></i></span><span class="icon-check"><i data-lucide="check"></i></span><span class="copied-text">copied!</span></button>
+                </div>
+            </article>
+
+            <!-- Artikel 2 -->
+            <article class="post" data-searchable id="ide-liar-tengah-malam">
+                <div class="post-meta">
+                    <div class="post-date"><i data-lucide="calendar-days"></i><span>Kamis, 4 Juni 2026</span></div>
+                    <span class="meta-separator"></span>
+                    <span class="reading-time">2 menit baca</span>
+                </div>
+                <h2 class="post-title">ide liar tengah malam</h2>
+                <div class="post-body">
+                    <p>Jam 1 pagi dan tiba-tiba kepikiran bikin blog minimalis kayak gini. Lucu ya, <span class="highlight">ide bagus sering muncul di jam-jam aneh</span>.</p>
+                    <p>Scroll sosial media udah mulai terasa berat — mungkin saatnya balik ke blog personal yang nggak butuh validasi likes. Cuma butuh ruang kosong dan kata-kata.</p>
+                    <p>Catatan kecil buat diri sendiri: jangan lupa tidur cukup, tapi juga jangan takut eksplorasi ide sampai larut.</p>
+                </div>
+                <div class="post-actions">
+                    <a href="#" class="post-social-icon"><i data-lucide="twitter"></i></a>
+                    <a href="#" class="post-social-icon"><i data-lucide="instagram"></i></a>
+                    <a href="#" class="post-social-icon"><i data-lucide="at-sign"></i></a>
+                    <button class="post-social-icon share-btn" data-title="ide liar tengah malam"><span class="icon-share"><i data-lucide="share-2"></i></span><span class="icon-check"><i data-lucide="check"></i></span><span class="copied-text">copied!</span></button>
+                </div>
+            </article>
+
+            <!-- Artikel 3 -->
+            <article class="post" data-searchable id="memulai-juni-dengan-pelan">
+                <div class="post-meta">
+                    <div class="post-date"><i data-lucide="calendar-days"></i><span>Senin, 1 Juni 2026</span></div>
+                    <span class="meta-separator"></span>
+                    <span class="reading-time">2 menit baca</span>
+                </div>
+                <h2 class="post-title">
