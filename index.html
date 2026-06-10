@@ -1,835 +1,327 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEKELabs</title>
-<link rel="icon" href="https://sekelabs.netlify.app/images/favicon.png">
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    overflow-x: hidden;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background-color: #ffffff;
-    color: #000000;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    padding-top: 90px;
-  }
-
-  .dark-mode {
-    background-color: #000000;
-    color: #ffffff;
-  }
-
-  .floating-header {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 40px);
-    max-width: 750px;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(9px) saturate(200%);
-    -webkit-backdrop-filter: blur(9px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 50px;
-    padding: 15px 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .dark-mode .floating-header {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(255, 255, 255, 0.06), 0 2px 8px rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(9px) saturate(200%);
-  -webkit-backdrop-filter: blur(9px) saturate(200%);
-  }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
-
-  .typing-container {
-    font-size: 1.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: 2px solid currentColor;
-    font-weight: 300;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .cursor {
-    display: inline-block;
-    width: 2px;
-    background-color: currentColor;
-    margin-left: 2px;
-    animation: blink 0.7s infinite;
-  }
-
-  @keyframes blink {
-    0%, 50%, 100% { opacity: 0; }
-    25%, 75% { opacity: 1; }
-  }
-
-  .toggle-icon {
-    width: 44px;
-    height: 44px;
-    border: 2px solid currentColor;
-    border-radius: 50%;
-    cursor: none;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    flex-shrink: 0;
-    margin-left: 20px;
-  }
-
-  .toggle-icon::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: currentColor;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .dark-mode .toggle-icon::before {
-    transform: scale(0.5);
-  }
-
-  .main-container {
-    width: 100%;
-    max-width: 750px;
-    margin: 20px auto;
-    padding: 0 15px;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  .header-content {
-    flex-grow: 1;
-  }
-
-  .divider {
-    border: 0;
-    height: 1px;
-    background-color: #ccc;
-    width: 100%;
-    margin: 10px 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .dark-mode .divider {
-    background-color: #444;
-  }
-
-  .article-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .article-item {
-    margin-bottom: 20px;
-  }
-
-  .article-image {
-    width: 90%;
-    height: auto;
-    display: block;
-    margin: 20px auto 40px auto;
-    border-radius: 8px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .article-title {
-    font-size: 2rem;
-    font-weight: 500;
-    margin: 0;
-    margin-bottom: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .article-body {
-    font-size: 1.5rem;
-    line-height: 1.6;
-    font-weight: 300;
-    margin: 0;
-    margin-bottom: 15px;
-    text-align: justify;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .footer-container {
-    width: 100%;
-    max-width: 750px;
-    margin: 0 auto;
-    margin-top: auto;
-    position: sticky;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    z-index: 5;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    padding-top: 5px;
-    padding-left: 15px; 
-    padding-right: 15px; 
-    box-sizing: border-box;
-  }
-
-  .dark-mode .footer-container {
-    background-color: rgba(0, 0, 0, 0.95);
-  }
-
-  .tag-navigation {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto; 
-    overflow-y: hidden;
-    gap: 8px;
-    padding-bottom: 10px;
-    align-items: center;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
-    max-width: 100%;
-  }
-
-  .tag-navigation::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  .tag-navigation::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
-  }
-
-  .tag-navigation::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .tag-navigation::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  .dark-mode .tag-navigation::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .dark-mode .tag-navigation::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-
-  .tag-item {
-    flex-shrink: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #666;
-    text-decoration: none;
-    padding: 0 16px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    white-space: nowrap;
-  }
-
-  .dark-mode .tag-item {
-    color: #bbb;
-    border-color: #444;
-  }
-
-  .tag-item:hover {
-    background-color: #f0f0f0;
-    color: #000;
-    transform: translateY(1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .dark-mode .tag-item:hover {
-    background-color: #333;
-    color: #fff;
-    transform: translateY(1px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  }
-
-  .post-navigation {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  .nav-link {
-    font-size: 1rem;
-    font-weight: 400;
-    color: #666;
-    text-decoration: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    cursor: none;
-  }
-
-  .dark-mode .nav-link {
-    color: #bbb;
-  }
-
-  .nav-link:hover {
-    text-decoration: underline;
-    transform: translateX(5px);
-  }
-
-  .nav-link.disabled {
-    color: #ccc;
-    cursor: not-allowed;
-  }
-
-  .dark-mode .nav-link.disabled {
-    color: #444;
-  }
-
-  footer {
-    padding: 12px 0;
-    font-size: 1rem;
-    font-weight: 300;
-    color: inherit;
-    text-align: center;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  footer a {
-    color: inherit;
-    text-decoration: none;
-    margin: 0 10px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  footer a:hover {
-    text-decoration: underline;
-    transform: translateY(-2px);
-    display: inline-block;
-  }
-
-  .search-container {
-    width: 100%;
-    display: flex;
-    align-items: center;
-  }
-
-  .search-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    height: 40px;
-  }
-
-  .search-input:focus {
-    outline: none;
-    border-color: #000;
-    transform: scale(1.02);
-  }
-
-  .dark-mode .search-input {
-    background-color: #333;
-    color: #fff;
-    border-color: #555;
-  }
-
-  .dark-mode .search-input:focus {
-    border-color: #fff;
-  }
-
-  .tag-and-search-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  .article-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-    color: #888;
-    flex-wrap: wrap;
-  }
-
-  .dark-mode .article-meta {
-    color: #aaa;
-  }
-
-  .article-date {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .article-tags {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .article-tag {
-    background-color: #f0f0f0;
-    color: #666;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-
-  .dark-mode .article-tag {
-    background-color: #2a2a2a;
-    color: #bbb;
-  }
-
-  /* Desktop View */
-  @media (min-width: 601px) {
-    .tag-and-search-wrapper {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .search-container {
-        width: auto;
-        margin-right: 20px;
-        margin-bottom: 0;
-        flex-grow: 1;
-        max-width: 300px;
-    }
-
-    .search-input {
-        width: 100%;
-    }
-
-    .tag-navigation {
-        justify-content: flex-start;
-        max-width: calc(100% - 320px);
-        min-width: 400px;
-    }
-  }
-
-  /* Mobile View */
-  @media (max-width: 600px) {
-    body {
-      padding: 10px;
-      padding-top: 75px;
-    }
-
-    .floating-header {
-      top: 10px;
-      width: calc(100% - 20px);
-      padding: 12px 20px;
-    }
-
-    .typing-container {
-      font-size: 1.2rem;
-    }
-
-    .toggle-icon {
-      width: 38px;
-      height: 38px;
-      margin-left: 10px;
-    }
-
-    .toggle-icon::before {
-      width: 16px;
-      height: 16px;
-    }
-
-    .article-title {
-      font-size: 1.3rem;
-    }
-
-    .article-body {
-      font-size: 1.05rem;
-      text-align: justify;
-    }
-
-    .divider {
-      margin: 10px 0;
-    }
-
-    .nav-link {
-      font-size: 0.9rem;
-    }
-
-    .tag-item {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-        height: 40px;
-    }
-
-    footer {
-        font-size: 16px;
-    }
-
-    .tag-navigation {
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .search-container {
-      margin-bottom: 10px;
-    }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tulis aja. — catatan pelan</title>
+    <meta name="description" content="Blog minimalis berisi catatan personal, renungan pagi, dan ide-ide liar yang ditulis pelan-pelan.">
+    <meta name="keywords" content="blog,catatan,personal,tulisan,minimalis,indonesia">
+    <meta property="og:title" content="tulis aja. — catatan pelan">
+    <meta property="og:description" content="Blog minimalis berisi catatan personal, renungan pagi, dan ide-ide liar yang ditulis pelan-pelan.">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://tulisaja.blog/home.html">
+
+    <script>
+        (function() {
+            const saved = localStorage.getItem('blog-theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #fafaf9;
+            --surface: #ffffff;
+            --border: #e7e5e4;
+            --text: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+            --accent-soft: #f1f5f9;
+            --link-color: #1c1917;
+            --link-hover: #57534e;
+            --transition: 0.2s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --surface: #1c1917;
+            --border: #292524;
+            --text: #fafaf9;
+            --text-secondary: #d6d3d1;
+            --text-muted: #78716c;
+            --accent-soft: #292524;
+            --link-color: #fafaf9;
+            --link-hover: #d6d3d1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            transition: background var(--transition), color var(--transition);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+        }
+
+        .container {
+            max-width: 660px;
+            margin: 0 auto;
+            padding: 40px 24px 30px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .blog-name {
+            font-size: 1.25rem;
+            font-weight: 550;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: background var(--transition), color var(--transition);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-soft);
+            color: var(--text);
+        }
+
+        .icon-btn .lucide {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.5;
+        }
+
+        .theme-btn .icon-sun,
+        .theme-btn .icon-moon { display: none; }
+        [data-theme="dark"] .theme-btn .icon-sun { display: block; }
+        [data-theme="light"] .theme-btn .icon-moon { display: block; }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px 0;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', 'Times New Roman', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: -0.01em;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-bottom: 50px;
+        }
+
+        .post-item {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            gap: 16px;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-item-link {
+            font-family: 'Playfair Display', 'Times New Roman', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-decoration: none;
+            line-height: 1.3;
+            transition: color var(--transition);
+            flex: 1;
+        }
+
+        .post-item-link:hover {
+            color: var(--link-hover);
+        }
+
+        .post-item-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+
+        .home-nav {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        .home-nav a {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            transition: color var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .home-nav a:hover { color: var(--text); }
+
+        .home-nav .lucide {
+            width: 16px;
+            height: 16px;
+            stroke-width: 1.6;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .footer .lucide {
+            width: 13px;
+            height: 13px;
+            stroke-width: 1.6;
+        }
+
+        @media (max-width: 500px) {
+            .container { padding: 30px 18px 30px; }
+            .hero h1 { font-size: 2rem; }
+            .post-item-link { font-size: 1.15rem; }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header class="header">
+            <span class="blog-name">tulis aja.</span>
+            <div class="header-actions">
+                <button class="icon-btn theme-btn" id="themeToggle" aria-label="Ganti mode">
+                    <i data-lucide="sun" class="icon-sun"></i>
+                    <i data-lucide="moon" class="icon-moon"></i>
+                </button>
+            </div>
+        </header>
 
-<div class="floating-header">
-  <div class="header-left">
-    <div class="typing-container" id="text"></div>
-    <div class="cursor"></div>
-  </div>
-  <div class="toggle-icon" id="toggleIcon"></div>
-</div>
-<div class="main-container">
-  <div class="header-content">
-    <section class="article-section">
-      <div class="article-item pohon-raksasa sequoia">
-        <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&h=400&fit=crop" alt="Pohon Sequoia raksasa menjulang tinggi" class="article-image">
-        <h2 class="article-title">Pohon Sequoia: Raksasa Hutan yang Menjulang ke Langit</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 20 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Pohon Raksasa</span>
-            <span class="article-tag">Sequoia</span>
-          </div>
-        </div>
-        <p class="article-body">Pohon Sequoia atau Sequoiadendron giganteum adalah salah satu makhluk hidup paling megah di planet ini. Dengan tinggi yang bisa mencapai lebih dari 80 meter dan diameter batang hingga 11 meter, pohon ini adalah testimoni hidup dari kekuatan dan ketahanan alam. Sequoia yang paling terkenal, bernama General Sherman, memiliki volume batang sekitar 1.487 meter kubik, menjadikannya pohon terbesar di dunia berdasarkan volume. Pohon-pohon ini hanya tumbuh secara alami di lereng barat Sierra Nevada, California, di ketinggian 1.400 hingga 2.150 meter di atas permukaan laut.</p>
-        <p class="article-body">Usia pohon Sequoia bisa mencapai 3.000 tahun, menjadikannya salah satu organisme hidup tertua di Bumi. Kulit kayu mereka yang tebal, mencapai 60 sentimeter, mengandung tanin yang melindungi dari api, serangga, dan penyakit. Bahkan ketika terkena kebakaran hutan, Sequoia sering kali bertahan dan terus tumbuh. Faktanya, api justru membantu regenerasi mereka—panas membuka kerucut biji dan membersihkan lantai hutan dari vegetasi yang bersaing, memberikan ruang bagi bibit muda untuk tumbuh.</p>
-        <p class="article-body">Ekosistem di sekitar Sequoia sangat kaya. Cabang-cabang besar mereka menjadi rumah bagi berbagai spesies burung, tupai, dan bahkan salamander. Akar mereka yang luas, meski tidak dalam, menyebar hingga satu hektar, menyerap air dan nutrisi dari tanah. Menariknya, akar Sequoia sering kali saling terkait dengan pohon lain di sekitarnya, membentuk jaringan yang memberikan stabilitas kolektif terhadap angin kencang dan badai. Sistem ini juga memfasilitasi pertukaran nutrisi dan air antar pohon, sebuah fenomena yang disebut "wood wide web".</p>
-        <p class="article-body">Sayangnya, habitat alami Sequoia terancam oleh perubahan iklim, kebakaran yang lebih intens, dan kekeringan berkepanjangan. Upaya konservasi sedang dilakukan untuk melindungi hutan-hutan ini, termasuk Sequoia National Park yang didirikan pada tahun 1890. Para ilmuwan juga mempelajari bagaimana pohon-pohon ini beradaptasi dengan kondisi ekstrem, berharap dapat menerapkan pelajaran tersebut dalam upaya reboisasi global. Mengunjungi hutan Sequoia adalah pengalaman spiritual—berdiri di bawah raksasa-raksasa ini mengingatkan kita akan kerapuhan dan keagungan kehidupan di Bumi.</p>
-      </div>
+        <section class="hero">
+            <h1>catatan pelan</h1>
+            <p class="subtitle">Kumpulan tulisan pendek tentang hal-hal sederhana yang terjadi sehari-hari.</p>
+        </section>
 
-      <hr class="divider">
-
-      <div class="article-item pohon-raksasa sequoia">
-        <img src="https://images.unsplash.com/photo-1511497584788-876760111969?w=600&h=400&fit=crop" alt="Hutan Sequoia dengan cahaya matahari menembus dedaunan" class="article-image">
-        <h2 class="article-title">Kehidupan di Bawah Naungan Sequoia: Ekosistem Hutan yang Unik</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 19 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Pohon Raksasa</span>
-            <span class="article-tag">Sequoia</span>
-          </div>
-        </div>
-        <p class="article-body">Hutan Sequoia bukan hanya kumpulan pohon raksasa, tetapi ekosistem kompleks yang menampung ribuan spesies. Kanopi yang tinggi menciptakan iklim mikro yang unik—lebih lembap, lebih sejuk, dan dengan pencahayaan yang terdifusi. Di lantai hutan, lapisan humus tebal dari jarum pinus, kerucut, dan ranting yang terdekomposisi menjadi tanah subur yang kaya akan nutrisi. Tanaman seperti dogwood, azalea, dan berbagai jenis pakis tumbuh subur di bawah naungan raksasa-raksasa ini.</p>
-        <p class="article-body">Fauna yang mendiami hutan Sequoia sangat beragam. Burung pelatuk acorn menggunakan batang pohon sebagai lumbung alami, mengebor lubang-lubang kecil untuk menyimpan ribuan biji ek. Beruang hitam sering terlihat mencari buah berry dan kacang-kacangan, sementara singa gunung berkeliaran di wilayah yang lebih terpencil. Tupai Douglas dengan lincah melompat dari cabang ke cabang, memainkan peran penting dalam penyebaran biji. Bahkan salamander raksasa Pacific ditemukan di sungai-sungai kecil yang mengalir melalui hutan ini.</p>
-        <p class="article-body">Siklus hidup Sequoia dimulai dari biji kecil seukuran serpihan gandum. Untuk berkecambah, biji ini membutuhkan kondisi yang tepat: tanah mineral yang terbuka, kelembapan yang cukup, dan cahaya matahari langsung. Kebakaran alami memainkan peran vital dalam proses ini. Api rendah intensitas membersihkan semak belukar, melepaskan mineral ke tanah, dan membuka kerucut yang melepaskan biji. Tanpa api, hutan Sequoia akan dipenuhi oleh vegetasi yang lebat, mencegah regenerasi alami.</p>
-        <p class="article-body">Namun, manajemen api yang salah selama abad ke-20—di mana semua kebakaran dipadamkan—telah menyebabkan akumulasi bahan bakar di lantai hutan. Ketika api akhirnya terjadi, intensitasnya jauh lebih tinggi, merusak bahkan pohon Sequoia dewasa yang biasanya tahan api. Program pembakaran terkontrol kini dilakukan untuk mengembalikan keseimbangan alami. Melalui pemahaman yang lebih baik tentang dinamika ekosistem ini, kita dapat memastikan bahwa hutan Sequoia akan terus berdiri megah untuk generasi mendatang, menjadi saksi bisu perjalanan waktu dan perubahan iklim.</p>
-      </div>
-
-      <hr class="divider" style="display: none;">
-
-      <div class="article-item bunga-sakura">
-        <img src="https://images.unsplash.com/photo-1522383225653-ed111181a951?w=600&h=400&fit=crop" alt="Bunga sakura mekar di musim semi" class="article-image">
-        <h2 class="article-title">Bunga Sakura: Simbol Keindahan yang Fana</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 18 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Bunga Sakura</span>
-          </div>
-        </div>
-        <p class="article-body">Bunga sakura atau cherry blossom adalah salah satu fenomena alam paling dinanti di Jepang dan berbagai belahan dunia. Mekar hanya selama satu hingga dua minggu setiap musim semi, bunga berwarna merah muda pucat hingga putih ini melambangkan keindahan yang fana dan sifat sementara kehidupan. Tradisi hanami—melihat bunga sakura—telah menjadi bagian integral dari budaya Jepang selama berabad-abad, di mana keluarga dan teman berkumpul di bawah pohon-pohon sakura untuk piknik dan merayakan kedatangan musim semi. Bunga sakura mengajarkan filosofi mono no aware, kesadaran akan ketidakkekalan segala sesuatu, yang mendorong kita untuk menghargai setiap momen indah dalam hidup.</p>
-      </div>
-
-      <hr class="divider" style="display: none;">
-
-      <div class="article-item kaktus-gurun">
-        <img src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600&h=400&fit=crop" alt="Kaktus tumbuh di gurun pasir" class="article-image">
-        <h2 class="article-title">Kaktus: Pejuang Tangguh di Gurun yang Gersang</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 17 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Kaktus Gurun</span>
-          </div>
-        </div>
-        <p class="article-body">Kaktus adalah master adaptasi yang telah berevolusi untuk bertahan hidup di lingkungan paling keras di planet ini. Dengan batang yang tebal dan berdaging, kaktus menyimpan air dalam jumlah besar untuk menghadapi bulan-bulan kekeringan. Duri-duri tajam yang menutupi permukaan mereka bukan hanya untuk perlindungan dari hewan herbivora, tetapi juga berfungsi mengurangi kehilangan air dengan menciptakan lapisan udara lembap di sekitar tanaman. Akar kaktus menyebar luas dan dangkal, memungkinkan mereka menyerap air hujan dengan cepat sebelum menguap. Beberapa spesies seperti Saguaro dapat hidup hingga 200 tahun dan tumbuh setinggi 12 meter, menjadi landmark ikonik di gurun Amerika Barat.</p>
-      </div>
-
-     <hr class="divider" style="display: none;">
-
-      <div class="article-item bambu-asia">
-        <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=600&h=400&fit=crop" alt="Hutan bambu hijau yang rimbun" class="article-image">
-        <h2 class="article-title">Bambu: Tanaman Serba Guna dengan Pertumbuhan Super Cepat</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 16 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Bambu Asia</span>
-          </div>
-        </div>
-        <p class="article-body">Bambu adalah salah satu tanaman dengan pertumbuhan tercepat di dunia—beberapa spesies dapat tumbuh hingga 91 sentimeter dalam sehari. Tanaman ini memiliki lebih dari 1.400 spesies yang tersebar di berbagai benua, terutama di Asia. Bambu memiliki kekuatan tarik yang melebihi baja, menjadikannya material konstruksi yang ideal dan ramah lingkungan. Di samping itu, bambu juga digunakan untuk membuat kertas, tekstil, furnitur, dan bahkan instrumen musik. Ekosistem bambu sangat penting bagi panda raksasa di China, yang diet mereka hampir sepenuhnya terdiri dari bambu. Hutan bambu juga berperan dalam mencegah erosi tanah dan menyerap karbon dioksida lebih efisien daripada banyak pohon lain.</p>
-      </div>
-
-     <hr class="divider" style="display: none;">
-
-      <div class="article-item mangrove-pesisir">
-        <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&h=400&fit=crop" alt="Hutan mangrove dengan akar-akar yang unik" class="article-image">
-        <h2 class="article-title">Mangrove: Penjaga Garis Pantai dan Nursery Laut</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 15 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Mangrove Pesisir</span>
-          </div>
-        </div>
-        <p class="article-body">Hutan mangrove adalah ekosistem unik yang tumbuh di zona pasang surut pesisir tropis dan subtropis. Dengan sistem akar yang khas—akar tunjang dan akar napas—mangrove mampu bertahan di tanah berlumpur dengan kadar garam tinggi dan kekurangan oksigen. Hutan ini berfungsi sebagai pelindung alami pantai dari erosi, badai, dan tsunami, meredam gelombang dan menstabilkan garis pantai. Mangrove juga berperan sebagai nursery bagi ribuan spesies ikan, udang, dan kepiting, menyediakan tempat berlindung dan makanan yang melimpah. Ekosistem ini menyimpan karbon lima kali lebih banyak daripada hutan tropis daratan, menjadikannya penting dalam mitigasi perubahan iklim global.</p>
-      </div>
-
-      <hr class="divider" style="display: none;">
-
-      <div class="article-item rafflesia-langka">
-        <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&h=400&fit=crop" alt="Bunga Rafflesia yang besar dan eksotis" class="article-image">
-        <h2 class="article-title">Rafflesia Arnoldii: Bunga Terbesar dan Paling Misterius di Dunia</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 14 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Rafflesia Langka</span>
-          </div>
-        </div>
-        <p class="article-body">Rafflesia arnoldii adalah bunga tunggal terbesar di dunia, dengan diameter mencapai satu meter dan berat hingga 11 kilogram. Bunga endemik Sumatra dan Kalimantan ini dikenal dengan julukan "bunga bangkai" karena mengeluarkan bau busuk menyerupai daging membusuk untuk menarik lalat sebagai penyerbuk. Rafflesia adalah parasit obligat yang hidup dengan menempel pada akar tanaman inang dari genus Tetrastigma. Tidak memiliki daun, batang, atau akar sendiri, Rafflesia sepenuhnya bergantung pada inangnya untuk nutrisi. Bunga ini mekar hanya selama lima hingga tujuh hari sebelum layu dan mati. Kelangkaan dan kesulitan perkembangbiakannya membuat Rafflesia menjadi spesies yang terancam punah, memerlukan upaya konservasi serius untuk memastikan kelangsungan hidupnya di alam liar.</p>
-      </div>
-
-      <hr class="divider" style="display: none;">
-
-      <div class="article-item venus-flytrap">
-        <img src="https://images.unsplash.com/photo-1628711905143-77ea60853caa?w=600&h=400&fit=crop" alt="Tanaman Venus Flytrap yang unik" class="article-image">
-        <h2 class="article-title">Venus Flytrap: Tanaman Karnivora yang Menakjubkan</h2>
-        <div class="article-meta">
-          <span class="article-date">📅 13 Oktober 2025</span>
-          <div class="article-tags">
-            <span class="article-tag">Venus Flytrap</span>
-          </div>
-        </div>
-        <p class="article-body">Venus flytrap (Dionaea muscipula) adalah salah satu tanaman karnivora paling terkenal dan menakjubkan di dunia. Endemik di rawa-rawa Carolina Utara dan Selatan, tanaman ini telah mengembangkan mekanisme perangkap yang sangat canggih untuk menangkap serangga. Daunnya yang berbentuk seperti mulut dengan gigi-gigi kecil di tepinya dilengkapi dengan rambut sensorik yang sangat sensitif. Ketika serangga menyentuh rambut ini dua kali dalam waktu 20 detik, perangkap akan menutup dengan kecepatan luar biasa—hanya dalam sepersepuluh detik. Ini adalah salah satu gerakan tercepat dalam kerajaan tumbuhan. Setelah tertangkap, serangga akan dicerna menggunakan enzim selama lima hingga dua belas hari, memberikan nitrogen dan nutrisi lain yang sulit diperoleh dari tanah rawa yang miskin hara. Venus flytrap adalah contoh sempurna dari evolusi adaptif, di mana tanaman mengembangkan strategi unik untuk bertahan hidup di lingkungan yang ekstrem.</p>
-      </div>
-    </section>
-  </div>
-</div>
-
-  <div class="footer-container">
-    <div class="tag-and-search-wrapper">
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Cari artikel...">
-        </div>
-        <nav class="tag-navigation" id="tagNavigation">
-            <!-- Tags will be generated dynamically -->
+        <nav class="post-list" aria-label="Daftar artikel">
+            <div class="post-item">
+                <a href="read-pagi-yang-pelan.html" class="post-item-link">pagi yang pelan di bulan juni</a>
+                <span class="post-item-date">6 Jun 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-ide-liar.html" class="post-item-link">ide liar tengah malam</a>
+                <span class="post-item-date">4 Jun 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-memulai-juni.html" class="post-item-link">memulai juni dengan pelan</a>
+                <span class="post-item-date">1 Jun 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-bermain-markah.html" class="post-item-link">bermain dengan markah</a>
+                <span class="post-item-date">28 Mei 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-kopi-tubruk.html" class="post-item-link">kopi tubruk favorit</a>
+                <span class="post-item-date">20 Mei 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-notifikasi-tertunda.html" class="post-item-link">notifikasi yang tertunda</a>
+                <span class="post-item-date">12 Mei 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-jalan-sore.html" class="post-item-link">jalan-jalan sore</a>
+                <span class="post-item-date">4 Mei 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-resep-telur-dadar.html" class="post-item-link">resep simpel telur dadar</a>
+                <span class="post-item-date">26 Apr 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-layar-penuh-tab.html" class="post-item-link">layar penuh tab</a>
+                <span class="post-item-date">17 Apr 2026</span>
+            </div>
+            <div class="post-item">
+                <a href="read-menata-meja.html" class="post-item-link">menata ulang meja</a>
+                <span class="post-item-date">7 Apr 2026</span>
+            </div>
         </nav>
+
+        <div class="home-nav">
+            <a href="notes.html"><i data-lucide="notebook-pen"></i> baca notes</a>
+        </div>
+
+        <footer class="footer">
+            <i data-lucide="sparkles"></i>
+            <span>ditulis pelan-pelan, tanpa beban</span>
+        </footer>
     </div>
-    <nav class="post-navigation">
-        <a href="#" id="prevBtn" class="nav-link disabled">« Sebelumnya</a>
-        <a href="#" id="nextBtn" class="nav-link">Selanjutnya »</a>
-    </nav>
-    <hr class="divider">
-    <footer>
-      <a href="mailto:sekelebat01@gmail.com">Email</a> | 
-      <a href="https://sekestore.netlify.app" target="_blank">Store</a> | 
-      <a href="https://instagram.com" target="_blank">Instagram</a>
-    </footer>
-  </div>
-</div>
 
-<script>
-  const sections = ["Visual", "Nature", "Earth", "SEKELabs"];
-  const textElement = document.getElementById("text");
-  const toggleIcon = document.getElementById("toggleIcon");
-  let sectionIndex = 0;
-  let charIndex = 0;
-
-  function type() {
-    const currentText = sections[sectionIndex];
-    if (charIndex < currentText.length) {
-      textElement.textContent += currentText.charAt(charIndex);
-      charIndex++;
-      setTimeout(type, 150);
-    } else {
-      setTimeout(() => {
-        textElement.textContent = '';
-        charIndex = 0;
-        sectionIndex = (sectionIndex + 1) % sections.length;
-        type();
-      }, 1000);
-    }
-  }
-
-  type();
-
-  toggleIcon.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-  });
-
-  const articles = document.querySelectorAll('.article-item');
-  const dividers = document.querySelectorAll('.article-section .divider');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const searchInput = document.getElementById('searchInput');
-  const tagNavigation = document.getElementById('tagNavigation');
-  let currentArticleIndex = 0;
-  let filteredArticles = Array.from(articles);
-
-  // Generate dynamic tags from articles - 100% DINAMIC
-  function generateTags() {
-    const tagsSet = new Set();
-
-    // tak all class from artikel (except 'article-item')
-    articles.forEach(article => {
-      const classes = article.className.split(' ');
-      classes.forEach(cls => {
-        if (cls !== 'article-item' && cls.trim() !== '') {
-          tagsSet.add(cls.trim());
-        }
-      });
-    });
-
-    // Create "All" tag
-    const allTag = document.createElement('a');
-    allTag.href = '#';
-    allTag.className = 'tag-item active';
-    allTag.dataset.tag = 'all';
-    allTag.textContent = 'All';
-    tagNavigation.appendChild(allTag);
-
-    // Create tags from article OTOMATIC
-    // Capitalize and format name tag
-    tagsSet.forEach(tag => {
-      const tagItem = document.createElement('a');
-      tagItem.href = '#';
-      tagItem.className = 'tag-item';
-      tagItem.dataset.tag = tag;
-
-      tagItem.textContent = tag.split('-').map(word => {
-        // if all uppercase (like UI, UX), let it be uppercase
-        if (word === word.toUpperCase() && word.length <= 3) {
-          return word.toUpperCase();
-        }
-        // Capitalize first letter
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      }).join(' ');
-
-      tagNavigation.appendChild(tagItem);
-    });
-
-    // Add click events to tags
-    const tagItems = document.querySelectorAll('.tag-item');
-    tagItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        // Remove active class from all tag
-        tagItems.forEach(tag => tag.classList.remove('active'));
-
-                // Add active class to tag 
-        e.target.classList.add('active');
-
-        const tag = e.target.dataset.tag;
-        searchInput.value = '';
-
-        if (tag === 'all') {
-          filteredArticles = Array.from(articles);
-        } else {
-          filteredArticles = Array.from(articles).filter(article => 
-            article.classList.contains(tag)
-          );
-        }
-
-        currentArticleIndex = 0;
-        showArticle(currentArticleIndex);
-      });
-    });
-  }
-
-  function updateNavigation() {
-    prevBtn.classList.toggle('disabled', currentArticleIndex === 0);
-    nextBtn.classList.toggle('disabled', currentArticleIndex === filteredArticles.length - 1);
-  }
-
-  function showArticle(index) {
-    articles.forEach(article => article.style.display = 'none');
-    dividers.forEach(divider => divider.style.display = 'none');
-
-    if (filteredArticles.length > 0) {
-      filteredArticles[index].style.display = 'block';
-      const dividerAfter = filteredArticles[index].nextElementSibling;
-      if (dividerAfter && dividerAfter.classList.contains('divider')) {
-        dividerAfter.style.display = 'block';
-      }
-    }
-    updateNavigation();
-  }
-
-  function filterAndDisplayArticles(query) {
-    filteredArticles = Array.from(articles).filter(article => {
-      const title = article.querySelector('.article-title').textContent.toLowerCase();
-      const body = article.querySelector('.article-body').textContent.toLowerCase();
-      const tags = article.className.toLowerCase();
-      return title.includes(query) || body.includes(query) || tags.includes(query);
-    });
-
-    currentArticleIndex = 0;
-    showArticle(currentArticleIndex);
-  }
-
-  prevBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (currentArticleIndex > 0) {
-      currentArticleIndex--;
-      showArticle(currentArticleIndex);
-    }
-  });
-
-  nextBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (currentArticleIndex < filteredArticles.length - 1) {
-      currentArticleIndex++;
-      showArticle(currentArticleIndex);
-    }
-  });
-
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase();
-    filterAndDisplayArticles(query);
-  });
-
-  // Generate tags dynamically
-  generateTags();
-
-  showArticle(currentArticleIndex);
-</script>
+    <script src="https://unpkg.com/lucide@0.344.0" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', () => {
+                const current = html.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('blog-theme', next);
+            });
+        });
+    </script>
 </body>
 </html>
